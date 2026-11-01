@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoTrack | Waste Collection & Recycling Dashboard</title>
+  <meta name="description" content="Role-based dashboard for citizens, collectors, and admins to track waste requests, collections, and recycling logs.">
+  
+  <!-- Supabase JS CDN v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+  <!-- Main Application Header / Navbar -->
+  <header class="app-nav">
+    <div class="nav-container">
+      <div class="brand-logo">
+        <div class="brand-icon">
+          <!-- Recycling leaf icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"></path>
+            <path d="M11 19h8.2a1.8 1.8 0 0 0 1.558-.89 1.785 1.785 0 0 0-.004-1.784l-2.61-4.526"></path>
+            <path d="M11 5.3a1.8 1.8 0 0 1 3.1 0l4.3 7.4a1.8 1.8 0 0 1-1.55 2.7H7.15a1.8 1.8 0 0 1-1.55-2.7z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>EcoTrack</h1>
+          <span>Operations Dashboard</span>
+        </div>
+      </div>
+
+      <!-- User Info & Action Toolbar -->
+      <div class="nav-user-bar">
+        
+        <!-- Live Role Switcher (Facilitates testing and view switching) -->
+        <div class="role-switcher-group" title="Preview or toggle roles">
+          <span class="switcher-label">View:</span>
+          <button type="button" class="btn btn-sm btn-outline role-switch-btn" data-role="Citizen" onclick="switchView('Citizen')">Citizen</button>
+          <button type="button" class="btn btn-sm btn-outline role-switch-btn" data-role="Collector" onclick="switchView('Collector')">Collector</button>
+          <button type="button" class="btn btn-sm btn-outline role-switch-btn" data-role="Admin" onclick="switchView('Admin')">Admin</button>
+        </div>
+
+        <!-- Current User Profile Pill -->
+        <div class="user-pill" id="user-profile-pill">
+          <div class="user-avatar" id="user-avatar-initial">U</div>
+          <div class="user-info">
+            <span class="user-name" id="user-display-name">Loading...</span>
+            <span class="badge" id="user-display-role">Citizen</span>
+          </div>
+        </div>
+
+        <!-- Logout Action -->
+        <button type="button" class="btn btn-outline btn-sm" id="btn-logout" onclick="logoutUser()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Global Alert / Status Banner -->
+  <div class="container" style="margin-top: 1rem;">
+    <div id="dashboard-alert" class="alert-box" style="display: none;"></div>
+  </div>
+
+  <!-- Dashboard Main Content Wrapper -->
+  <main class="dashboard-wrapper container">
+
+    <!-- ================================================================== -->
+    <!-- 1. CITIZEN VIEW CONTAINER (id="citizen-view")                      -->
+    <!-- ================================================================== -->
+    <div id="citizen-view" class="role-view-container">
+      
+      <!-- Role Header Banner -->
+      <div class="view-header">
+        <div>
+          <h2>Citizen Recycling Portal</h2>
+          <p>Schedule recyclable waste pickups from your household and track collection progress.</p>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="fetchCitizenRequests()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh Requests
+        </button>
+      </div>
+
+      <!-- Citizen Metric Cards Grid (CSS Grid) -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon green">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Total Requests</span>
+            <h3 class="metric-value" id="citizen-metric-total">0</h3>
+            <span class="metric-sub">Scheduled pickups</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon amber">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Pending Pickups</span>
+            <h3 class="metric-value" id="citizen-metric-pending">0</h3>
+            <span class="metric-sub">Awaiting collector dispatch</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon forest">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Collected Pickups</span>
+            <h3 class="metric-value" id="citizen-metric-collected">0</h3>
+            <span class="metric-sub">Successfully diverted</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Recycled Volume</span>
+            <h3 class="metric-value" id="citizen-metric-weight">0 kg</h3>
+            <span class="metric-sub">Environmental impact</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form to submit a new waste request -->
+      <section class="card form-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Schedule a New Waste Pickup</h3>
+            <p>Select your waste category and provide address details for collector pickup.</p>
+          </div>
+        </div>
+        
+        <form id="form-waste-request" onsubmit="submitWasteRequest(event)" class="card-body">
+          <div class="form-grid">
+            
+            <!-- Waste Type Selector (Plastic, Electronic, Organic) -->
+            <div class="form-group">
+              <label for="waste_type" class="form-label">Waste Type <span class="required">*</span></label>
+              <select id="waste_type" name="waste_type" class="form-control" required>
+                <option value="Plastic" selected>Plastic (Bottles, HDPE, Containers)</option>
+                <option value="Electronic">Electronic (E-Waste, Appliances, Cables)</option>
+                <option value="Organic">Organic (Compost, Food & Yard Waste)</option>
+              </select>
+            </div>
+
+            <!-- Estimated Weight (kg) -->
+            <div class="form-group">
+              <label for="waste-weight" class="form-label">Estimated Weight (kg) <span class="required">*</span></label>
+              <input 
+                type="number" 
+                id="waste-weight" 
+                name="weight_kg" 
+                class="form-control" 
+                placeholder="e.g. 12.5" 
+                step="0.1" 
+                min="0.1" 
+                required>
+            </div>
+
+            <!-- Preferred Date -->
+            <div class="form-group">
+              <label for="waste-date" class="form-label">Preferred Pickup Date</label>
+              <input 
+                type="date" 
+                id="waste-date" 
+                name="preferred_date" 
+                class="form-control">
+            </div>
+
+          </div>
+
+          <!-- Pickup Address -->
+          <div class="form-group">
+            <label for="waste-address" class="form-label">Pickup Address & Street Details <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="waste-address" 
+              name="address" 
+              class="form-control" 
+              placeholder="e.g. 42 Oakwood Drive, Apt 3B, North Sector" 
+              required>
+          </div>
+
+          <!-- Notes / Description -->
+          <div class="form-group">
+            <label for="waste-notes" class="form-label">Additional Instructions / Item Details</label>
+            <textarea 
+              id="waste-notes" 
+              name="notes" 
+              class="form-control" 
+              rows="2" 
+              placeholder="e.g. 2 bags placed by the front porch, please ring bell upon arrival."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-submit-request">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Submit Waste Request
+          </button>
+        </form>
+      </section>
+
+      <!-- Table displaying past requests -->
+      <section class="card table-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>My Past Waste Requests</h3>
+            <p>Ledger of your scheduled collections, statuses, and collection records.</p>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="citizen-requests-table">
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>Waste Type</th>
+                <th>Est. Weight</th>
+                <th>Pickup Address</th>
+                <th>Preferred Date</th>
+                <th>Status</th>
+                <th>Submitted On</th>
+              </tr>
+            </thead>
+            <tbody id="citizen-requests-tbody">
+              <tr>
+                <td colspan="7" class="table-loading">Loading your waste requests...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+
+    <!-- ================================================================== -->
+    <!-- 2. COLLECTOR VIEW CONTAINER (id="collector-view")                  -->
+    <!-- ================================================================== -->
+    <div id="collector-view" class="role-view-container" style="display: none;">
+      
+      <!-- Role Header Banner -->
+      <div class="view-header">
+        <div>
+          <h2>Collector Dispatch Portal</h2>
+          <p>Inspect pending citizen pickups, record weighed drop-offs, and update collection statuses.</p>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="fetchPendingRequests()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh Pending Queue
+        </button>
+      </div>
+
+      <!-- Collector Metric Cards Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon amber">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Pending Pickups</span>
+            <h3 class="metric-value" id="collector-metric-pending">0</h3>
+            <span class="metric-sub">Awaiting collection</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon forest">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Logged Collections</span>
+            <h3 class="metric-value" id="collector-metric-completed">0</h3>
+            <span class="metric-sub">Marked as Collected</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon teal">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Total Collected</span>
+            <h3 class="metric-value" id="collector-metric-weight">0 kg</h3>
+            <span class="metric-sub">Delivered to facilities</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table showing all 'Pending' waste requests -->
+      <section class="card table-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Pending Waste Requests (Available for Collection)</h3>
+            <p>Click "Select for Pickup" on any pending request to automatically populate the collection form below.</p>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="collector-pending-table">
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>Citizen</th>
+                <th>Waste Type</th>
+                <th>Est. Weight</th>
+                <th>Pickup Address</th>
+                <th>Date / Notes</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="collector-pending-tbody">
+              <tr>
+                <td colspan="8" class="table-loading">Querying pending waste requests...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Form to submit a new collection (entering request_id and weight_kg) -->
+      <section class="card form-card" id="collector-form-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Submit New Collection</h3>
+            <p>Enter the verified collection details to log the record into `collections` and update request status to 'Collected'.</p>
+          </div>
+        </div>
+
+        <form id="form-log-collection" onsubmit="logCollection(event)" class="card-body">
+          <div class="form-grid">
+            
+            <!-- Request ID input -->
+            <div class="form-group">
+              <label for="col-request-id" class="form-label">
+                <span>Request ID</span> 
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  type="text" 
+                  id="col-request-id" 
+                  name="request_id" 
+                  class="form-control" 
+                  placeholder="e.g. REQ-1001 or select from table above" 
+                  required>
+              </div>
+              <span class="form-hint">Tip: Click "Select for Pickup" in the table above to fill this automatically.</span>
+            </div>
+
+            <!-- Actual Weight (kg) -->
+            <div class="form-group">
+              <label for="col-weight" class="form-label">
+                <span>Actual Collected Weight (kg)</span>
+                <span class="required">*</span>
+              </label>
+              <input 
+                type="number" 
+                id="col-weight" 
+                name="weight_kg" 
+                class="form-control" 
+                placeholder="e.g. 18.2" 
+                step="0.1" 
+                min="0.1" 
+                required>
+            </div>
+
+            <!-- Drop-off Facility -->
+            <div class="form-group">
+              <label for="col-facility" class="form-label">Drop-off Recycling Facility</label>
+              <select id="col-facility" name="facility" class="form-control">
+                <option value="Central Materials Recovery Facility">Central Materials Recovery Facility (MRF)</option>
+                <option value="GreenFuture Polymer Plant">GreenFuture Polymer Plant</option>
+                <option value="Metro E-Waste Recovery Hub">Metro E-Waste Recovery Hub</option>
+                <option value="EcoCompost Bio-Processing Yard">EcoCompost Bio-Processing Yard</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="col-notes" class="form-label">Collection / Quality Notes</label>
+            <input 
+              type="text" 
+              id="col-notes" 
+              name="notes" 
+              class="form-control" 
+              placeholder="e.g. Materials pre-sorted and weighed on truck scale. Clean batch.">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-log-collection">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+            Log Collection & Mark as Collected
+          </button>
+        </form>
+      </section>
+
+      <!-- Recent Completed Collections Table -->
+      <section class="card table-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Recent Logged Collections</h3>
+            <p>Verified pickups recorded in the database by collectors.</p>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Collection ID</th>
+                <th>Request ID</th>
+                <th>Actual Weight (kg)</th>
+                <th>Facility Destination</th>
+                <th>Collection Timestamp</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="collector-history-tbody">
+              <tr>
+                <td colspan="6" class="table-empty">No recent collections logged yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+
+    <!-- ================================================================== -->
+    <!-- 3. ADMIN VIEW CONTAINER (id="admin-view")                          -->
+    <!-- ================================================================== -->
+    <div id="admin-view" class="role-view-container" style="display: none;">
+      
+      <!-- Role Header Banner -->
+      <div class="view-header">
+        <div>
+          <h2>System Administration & Recycling Intelligence</h2>
+          <p>Municipal overview of completed waste collections, verified facilities, and recycling audit logs.</p>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="fetchAdminData()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh Admin Data
+        </button>
+      </div>
+
+      <!-- Admin Global Metrics (CSS Grid) -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon forest">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Total Recycled</span>
+            <h3 class="metric-value" id="admin-metric-weight">0.00 kg</h3>
+            <span class="metric-sub">Processed through facilities</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon teal">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Estimated CO₂ Offset</span>
+            <h3 class="metric-value" id="admin-metric-carbon">0 kg</h3>
+            <span class="metric-sub">Emissions avoided</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon green">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Completed Collections</span>
+            <h3 class="metric-value" id="admin-metric-collections">0</h3>
+            <span class="metric-sub">Total pickups logged</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M7 3h10v4H7zM7 11h2v2H7zm0 4h2v2H7zm8-4h2v2h-2zm0 4h2v2h-2z"></path></svg>
+          </div>
+          <div class="metric-content">
+            <span class="metric-label">Active Facilities</span>
+            <h3 class="metric-value" id="admin-metric-facilities">4</h3>
+            <span class="metric-sub">Certified processing hubs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table 1: All Completed Collections -->
+      <section class="card table-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Completed Waste Collections Ledger</h3>
+            <p>Audit trail of all verified collector pickups logged into `collections` table.</p>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="admin-collections-table">
+            <thead>
+              <tr>
+                <th>Collection ID</th>
+                <th>Request ID</th>
+                <th>Weight (kg)</th>
+                <th>Collector ID / Name</th>
+                <th>Destination Facility</th>
+                <th>Collected Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="admin-collections-tbody">
+              <tr>
+                <td colspan="6" class="table-loading">Querying completed collections...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Table 2: Recycling Logs Joined with Facilities -->
+      <section class="card table-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h3>Recycling Logs Joined with Processing Facilities</h3>
+            <p>Database query: `recycling_logs` joined with `facilities` to track verified batch diversion.</p>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="admin-logs-table">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Material Type</th>
+                <th>Weight (kg)</th>
+                <th>Facility Name</th>
+                <th>Facility Location</th>
+                <th>Facility Type</th>
+                <th>Carbon Offset</th>
+                <th>Logged At</th>
+              </tr>
+            </thead>
+            <tbody id="admin-logs-tbody">
+              <tr>
+                <td colspan="8" class="table-loading">Querying recycling logs and facilities...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Application Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 EcoTrack Systems. Production-Ready Waste Collection & Recycling Tracking Platform.</p>
+    </div>
+  </footer>
+
+  <!-- Application Core Script -->
+  <script src="app.js"></script>
+</body>
+</html>

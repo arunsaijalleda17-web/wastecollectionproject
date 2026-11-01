@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoTrack | Waste Collection & Recycling Tracking</title>
+  <meta name="description" content="Sustainable waste collection and recycling tracking system for Citizens, Collectors, and Municipal Administrators.">
+  
+  <!-- Supabase JS CDN v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+  <!-- Top Navigation Header -->
+  <header class="app-nav">
+    <div class="nav-container">
+      <div class="brand-logo">
+        <div class="brand-icon">
+          <!-- Recycling leaf icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"></path>
+            <path d="M11 19h8.2a1.8 1.8 0 0 0 1.558-.89 1.785 1.785 0 0 0-.004-1.784l-2.61-4.526"></path>
+            <path d="M11 5.3a1.8 1.8 0 0 1 3.1 0l4.3 7.4a1.8 1.8 0 0 1-1.55 2.7H7.15a1.8 1.8 0 0 1-1.55-2.7z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>EcoTrack</h1>
+          <span>Waste & Recycling Tracking</span>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link-btn">Go to Dashboard &rarr;</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Centered Login & Registration Modal / Container (CSS Flexbox) -->
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      
+      <!-- Brand Header inside card -->
+      <div class="auth-card-header">
+        <div class="auth-leaf-badge">🌱 Circular Economy Portal</div>
+        <h2 id="auth-title">Welcome to EcoTrack</h2>
+        <p id="auth-subtitle">Sign in or create an account to manage waste pickups and recycling tracking.</p>
+      </div>
+
+      <!-- Auth Switcher Tabs -->
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="tab-login-btn" onclick="switchAuthTab('login')">
+          Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-signup-btn" onclick="switchAuthTab('signup')">
+          Register
+        </button>
+      </div>
+
+      <!-- Feedback Alert Box -->
+      <div id="auth-alert" class="alert-box" style="display: none;"></div>
+
+      <!-- ================================================================ -->
+      <!-- 1. SIGN IN FORM                                                  -->
+      <!-- ================================================================ -->
+      <form id="login-form" class="auth-form" onsubmit="loginUser(event)">
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </span>
+            <input 
+              type="email" 
+              id="login-email" 
+              class="form-control" 
+              placeholder="name@example.com" 
+              required 
+              autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
+            <input 
+              type="password" 
+              id="login-password" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="btn-login-submit">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          Sign In
+        </button>
+
+        <p class="auth-switch-prompt">
+          Don't have an account? <a href="#" onclick="switchAuthTab('signup'); return false;">Create one now</a>
+        </p>
+      </form>
+
+      <!-- ================================================================ -->
+      <!-- 2. REGISTRATION FORM (Name, Email, Contact, Password, Role)       -->
+      <!-- ================================================================ -->
+      <form id="signup-form" class="auth-form" style="display: none;" onsubmit="signUpUser(event)">
+        
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="signup-name" class="form-label">Full Name</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </span>
+            <input 
+              type="text" 
+              id="signup-name" 
+              class="form-control" 
+              placeholder="e.g. Jordan Miller" 
+              required 
+              autocomplete="name">
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="signup-email" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </span>
+            <input 
+              type="email" 
+              id="signup-email" 
+              class="form-control" 
+              placeholder="name@example.com" 
+              required 
+              autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Contact (Phone / WhatsApp) -->
+        <div class="form-group">
+          <label for="signup-contact" class="form-label">Contact / Phone Number</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </span>
+            <input 
+              type="text" 
+              id="signup-contact" 
+              class="form-control" 
+              placeholder="e.g. +1 (555) 019-2834" 
+              required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="signup-password" class="form-label">
+            <span>Password</span>
+            <span class="form-hint">At least 6 characters</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
+            <input 
+              type="password" 
+              id="signup-password" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              minlength="6" 
+              autocomplete="new-password">
+          </div>
+        </div>
+
+        <!-- Role Selector: Citizen, Collector, Admin -->
+        <div class="form-group">
+          <label for="signup-role" class="form-label">Account Role</label>
+          <select id="signup-role" class="form-control select-role" required>
+            <option value="Citizen" selected>Citizen (Schedule & Track Waste Pickups)</option>
+            <option value="Collector">Collector (Pickup Requests & Log Collections)</option>
+            <option value="Admin">Admin (Analytics, Collections & Recycling Logs)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="btn-signup-submit">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          Create Account
+        </button>
+
+        <p class="auth-switch-prompt">
+          Already registered? <a href="#" onclick="switchAuthTab('login'); return false;">Sign in here</a>
+        </p>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- System Features Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-feature">
+        <strong>♻️ Sorted Materials</strong>
+        <p>Plastic, Electronic & Organic waste segregation</p>
+      </div>
+      <div class="footer-feature">
+        <strong>🚛 Collector Routing</strong>
+        <p>Verified weight logs & facility transfers</p>
+      </div>
+      <div class="footer-feature">
+        <strong>📊 Municipal Transparency</strong>
+        <p>Real-time diversion metrics & carbon offset</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Tab Toggle Script & Application Logic -->
+  <script>
+    function switchAuthTab(mode) {
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+      const loginTabBtn = document.getElementById('tab-login-btn');
+      const signupTabBtn = document.getElementById('tab-signup-btn');
+      const authTitle = document.getElementById('auth-title');
+      const authSubtitle = document.getElementById('auth-subtitle');
+      const alertBox = document.getElementById('auth-alert');
+
+      if (alertBox) alertBox.style.display = 'none';
+
+      if (mode === 'signup') {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        loginTabBtn.classList.remove('active');
+        signupTabBtn.classList.add('active');
+        authTitle.textContent = 'Create New Account';
+        authSubtitle.textContent = 'Join the sustainable waste management and recycling tracking network.';
+      } else {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        loginTabBtn.classList.add('active');
+        signupTabBtn.classList.remove('active');
+        authTitle.textContent = 'Welcome Back';
+        authSubtitle.textContent = 'Sign in to access your recycling operations portal.';
+      }
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

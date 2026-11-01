@@ -1,0 +1,897 @@
+/* ==============================================================================
+   EcoTrack - Waste Collection & Recycling Tracking Design System
+   Modern, eco-friendly color scheme: Forest green, soft white, light gray
+   ============================================================================== */
+
+:root {
+  /* Forest Green Palette */
+  --forest-900: #081c15;
+  --forest-800: #1b4332;
+  --forest-700: #2d6a4f;
+  --forest-600: #40916c;
+  --forest-500: #52b788;
+  --forest-400: #74c69d;
+  --forest-300: #95d5b2;
+  --forest-200: #b7e4c7;
+  --forest-100: #d8f3dc;
+  --forest-50:  #ebfbee;
+
+  /* Earthy & Accent Hues */
+  --accent-teal: #0f766e;
+  --accent-teal-bg: #ccfbf1;
+  --accent-amber: #b45309;
+  --accent-amber-bg: #fef3c7;
+  --accent-blue: #0369a1;
+  --accent-blue-bg: #e0f2fe;
+  --accent-red: #be123c;
+  --accent-red-bg: #ffe4e6;
+  --accent-purple: #6b21a8;
+  --accent-purple-bg: #f3e8ff;
+
+  /* Soft Whites & Light Grays */
+  --bg-app: #f4f7f5;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --surface-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-subtle: #cbd5e1;
+  --border-focus: #2d6a4f;
+
+  /* Typography Colors */
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-light: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Fonts */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Soft Box Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 2px 4px 0 rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 25px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* Rounded Corners */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--forest-700);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--forest-800);
+  text-decoration: underline;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ==============================================================================
+   Top Navigation
+   ============================================================================== */
+.app-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  gap: 1rem;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--forest-800), var(--forest-600));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(45, 106, 79, 0.3);
+}
+
+.brand-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.brand-text h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--forest-800);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.brand-text span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-link-btn {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--forest-700);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--forest-50);
+  border: 1px solid var(--forest-200);
+  transition: var(--transition);
+}
+
+.nav-link-btn:hover {
+  background-color: var(--forest-100);
+  text-decoration: none;
+}
+
+/* User pill in dashboard navigation */
+.nav-user-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.role-switcher-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--surface-alt);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.switcher-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-right: 0.25rem;
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background-color: var(--forest-700);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==============================================================================
+   CSS Flexbox: Centering Login & Registration Modal
+   ============================================================================== */
+.auth-body {
+  background: linear-gradient(135deg, #eef5f1 0%, #f4f7f5 50%, #e8f3ed 100%);
+}
+
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 140px);
+  padding: 2.5rem 1.5rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 2.25rem;
+  transition: var(--transition);
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.auth-leaf-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--forest-800);
+  background-color: var(--forest-100);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-card-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--forest-900);
+  margin-bottom: 0.5rem;
+}
+
+.auth-card-header p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Switcher Tabs inside Auth Card */
+.auth-tabs {
+  display: flex;
+  background-color: var(--surface-alt);
+  padding: 0.3rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.auth-tab-btn.active {
+  background-color: var(--surface);
+  color: var(--forest-800);
+  box-shadow: var(--shadow-xs);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.auth-switch-prompt {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.auth-switch-prompt a {
+  color: var(--forest-700);
+  font-weight: 600;
+}
+
+/* ==============================================================================
+   Form System & Inputs
+   ============================================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-label .required {
+  color: var(--accent-red);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-light);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-light);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper .form-control {
+  padding-left: 2.6rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--forest-600);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--forest-700);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--forest-800);
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.25);
+  text-decoration: none;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface-alt);
+  color: var(--forest-800);
+  border-color: var(--forest-600);
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-xs);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ==============================================================================
+   Dashboard Layout & Containers
+   ============================================================================== */
+.dashboard-wrapper {
+  padding-top: 1.75rem;
+  padding-bottom: 3.5rem;
+  flex: 1;
+}
+
+/* Distinct container views toggled based on user role */
+.role-view-container {
+  display: none;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.view-header h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--forest-900);
+}
+
+.view-header p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* ==============================================================================
+   CSS Grid: Dashboard Metric Cards
+   ============================================================================== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.35rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metric-icon.green {
+  background-color: var(--forest-100);
+  color: var(--forest-700);
+}
+
+.metric-icon.forest {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.metric-icon.amber {
+  background-color: var(--accent-amber-bg);
+  color: var(--accent-amber);
+}
+
+.metric-icon.teal {
+  background-color: var(--accent-teal-bg);
+  color: var(--accent-teal);
+}
+
+.metric-icon.blue {
+  background-color: var(--accent-blue-bg);
+  color: var(--accent-blue);
+}
+
+.metric-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-light);
+  letter-spacing: 0.03em;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.metric-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ==============================================================================
+   Cards & Form Grids
+   ============================================================================== */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-title-group h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--forest-900);
+}
+
+.card-title-group p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Form Grid (CSS Grid) */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ==============================================================================
+   CSS Grid & Responsive Table Styles
+   ============================================================================== */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  background-color: var(--surface-alt);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: var(--transition);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.table-loading, .table-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem !important;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ==============================================================================
+   Badges & Pills
+   ============================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Status Badges */
+.badge-pending {
+  background-color: var(--accent-amber-bg);
+  color: var(--accent-amber);
+}
+
+.badge-collected {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* Role Badges */
+.badge-citizen {
+  background-color: var(--accent-blue-bg);
+  color: var(--accent-blue);
+}
+
+.badge-collector {
+  background-color: var(--accent-amber-bg);
+  color: var(--accent-amber);
+}
+
+.badge-admin {
+  background-color: var(--accent-purple-bg);
+  color: var(--accent-purple);
+}
+
+/* Waste Type Badges */
+.badge-plastic {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-electronic {
+  background-color: #fae8ff;
+  color: #86198f;
+}
+
+.badge-organic {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* Code ID Tag */
+.id-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background-color: var(--surface-alt);
+  padding: 0.2rem 0.45rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ==============================================================================
+   Alerts & Notifications
+   ============================================================================== */
+.alert-box {
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid transparent;
+  animation: fadeIn 0.2s ease;
+}
+
+.alert-box.success {
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.alert-box.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.alert-box.info {
+  background-color: #e0f2fe;
+  color: #075985;
+  border-color: #7dd3fc;
+}
+
+/* ==============================================================================
+   Footer
+   ============================================================================== */
+.app-footer {
+  margin-top: auto;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: 0.825rem;
+  color: var(--text-muted);
+}
+
+.footer-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-feature {
+  text-align: center;
+}
+
+.footer-feature strong {
+  color: var(--forest-800);
+  display: block;
+}
+
+/* ==============================================================================
+   Responsive Media Queries
+   ============================================================================== */
+@media (max-width: 992px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-user-bar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-user-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .role-switcher-group {
+    justify-content: center;
+  }
+
+  .auth-wrapper {
+    padding: 1rem 0.5rem;
+  }
+}
